@@ -4,23 +4,16 @@ import sys
 import time
 
 class Client(threading.Thread):
+    def __init__(self, nick, host, port):
+        super(Client, self).__init__()
+        self.host = host
+        self.port = int(port)
+        self.nick = nick
+
     def run(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = input('IP des Chatpartners:')
-        self.port = int(input('Port des Chatpartners:'))
-        self.nick = input('Wie willst du heißen?')
-
         self.conn()
         print('Verbunden!\n')
-
-        while True:
-            msg = input('>')
-            if msg == '':
-                continue
-            if msg == '/quit':
-                self.send("/quit")
-                exit()
-            self.send(msg)
 
     def conn(self):
         self.socket.connect((self.host, self.port))
