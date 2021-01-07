@@ -1,0 +1,2 @@
+python cli.py
+pause

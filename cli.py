@@ -25,13 +25,11 @@ class chatForm(npyscreen.FormBaseNew):
         self.add_handlers(event_handlers)
 
         y, x = self.useable_space()
-        self.chatFeed = self.add(npyscreen.MultiLineEdit, name="Feed", editable=False)
+        self.chatFeed = self.add(npyscreen.BoxTitle, name="Feed", editable=False, max_height=23, scroll_slow=True)
         self.chatInput = self.add(ChatInput, name="Input", footer="Enter -> Senden", rely=25)
-        self.chatInput.entry_widget.handlers.update({curses.ascii.CR: self.exit_app})
+        self.chatInput.entry_widget.handlers.update({curses.ascii.CR: self.parentApp.send_message})
 
-    def send_message(self, _input):
-        msg = self.chatInput.value
-        chatClient.send(msg)
+        self.chatFeed.values = []
 
     def exit_app(self, _input):
         exit(0)
@@ -41,15 +39,27 @@ class ChatInput(npyscreen.BoxTitle):
 
 class ChatApp(npyscreen.NPSAppManaged):
     def onStart(self):
-        self.addForm('MAIN', setupForm, name='Chat Setup')
-        self.addForm('CHAT', chatForm, name='Peer-2-Peer Chat')
-        self.chatServer = server.Server()
+        self.mainForm = self.addForm('MAIN', setupForm, name='Chat Setup')
+        self.chatForm = self.addForm('CHAT', chatForm, name='Peer-2-Peer Chat')
+        self.chatServer = server.Server(self)
         self.chatServer.daemon = True
         self.chatServer.start()
 
     def startClient(self, nickname, ip, port):
         self.chatClient = client.Client(nickname, ip, port)
         self.chatClient.start()
+        self.nickname = nickname
+
+    def send_message(self, _input):
+        if len(self.chatApp.chatForm.chatFeed.values) > 20:
+                self.chatApp.chatForm.chatFeed.values = []
+        msg = self.chatForm.chatInput.value
+        if msg != '':
+            self.chatClient.send(msg)
+            self.chatForm.chatFeed.values.append('{0}>  {1}'.format(self.nickname, msg))
+            self.chatForm.chatInput.value = ""
+            self.chatForm.chatFeed.display()
+            self.chatForm.chatInput.display()
         
 
 if __name__ == '__main__':

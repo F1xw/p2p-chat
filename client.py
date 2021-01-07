@@ -21,6 +21,8 @@ class Client(threading.Thread):
         
 
     def send(self, msg):
+        if msg == '':
+            return False
         self.socket.send(msg.encode())
 
 
