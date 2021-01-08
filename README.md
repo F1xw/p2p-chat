@@ -22,7 +22,7 @@ Client A        Client B
 As you can see, there  is no third-party server involved when using **peer-to-peer**.
 All the messages you send and receive are private. They're only seen by your client and the client you are connected to.
 
-![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) `WARNING:` Nothing this client sends or receives is encrypted. Do only use it when connected to a private networks.
+![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) `WARNING:` Nothing this client sends or receives is encrypted. Do only use it when connected to a private network.
 
 
 # Installation
