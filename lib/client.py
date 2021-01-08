@@ -25,7 +25,7 @@ class Client(threading.Thread):
         except socket.error:
             self.chatApp.sysMsg("Could not connect. Attempt timed out.")
             return False
-        self.socket.send("%/init {0} {1} {2}".format(self.chatApp.nickname, "localhost", self.chatApp.port).encode())
+        self.socket.send("\b/init {0} {1} {2}".format(self.chatApp.nickname, self.chatApp.hostname, self.chatApp.port).encode())
         self.chatApp.sysMsg("Connected.")
         self.isConnected = True
     

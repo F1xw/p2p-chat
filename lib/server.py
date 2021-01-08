@@ -29,7 +29,7 @@ class Server(threading.Thread):
         command = command[0][2:]
         if not command in self.commandDict:
             self.chatApp.sysMsg("Your partner sent an invalid command. Make sure they use the same version as you!")
-            self.chatApp.chatClient.send("%/syntaxErr")
+            self.chatApp.chatClient.send("\b/syntaxErr")
         else:
             if self.commandDict[command][1] == 0:
                 self.commandDict[command][0]()
@@ -38,7 +38,7 @@ class Server(threading.Thread):
             else:
                 self.chatApp.sysMsg("Your partner sent an invalid command syntax.")
                 self.chatApp.sysMsg("Make sure they use the same version as you!")
-                self.chatApp.chatClient.send("%/syntaxErr")
+                self.chatApp.chatClient.send("\b/syntaxErr")
 
 
     def run(self):
@@ -52,11 +52,11 @@ class Server(threading.Thread):
             self.chatApp.partner = "Unknown"
         else:
             init = init.decode()
-            if init.startswith("%/init"):
+            if init.startswith("\b/init"):
                 init = init[2:].split(' ')
                 self.chatApp.partner = init[1]
+                self.chatApp.partnerIP = init[2]
                 self.chatApp.partnerPort = init[3]
-                self.chatApp.partnerIP = socket.gethostbyname(init[2])
             else:
                 self.chatApp.partner = "Unknown"
                 self.chatApp.partnerPort = "unknown"
@@ -76,7 +76,7 @@ class Server(threading.Thread):
             if not data:
                 self.chatApp.sysMsg("ERROR: Recieved an empty message.")
 
-            if data.decode().startswith('%/'):
+            if data.decode().startswith('\b/'):
                 self.commandHandler(data)
             else:
                 self.chatApp.messageLog.append("{0} >  {1}".format(self.chatApp.partner, data.decode()))
