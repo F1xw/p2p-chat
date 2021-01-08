@@ -25,15 +25,14 @@ class Client(threading.Thread):
         except socket.error:
             self.chatApp.sysMsg("Could not connect. Attempt timed out.")
             return False
-        self.socket.send("%/nick {0}".format(self.chatApp.nickname).encode())
+        self.socket.send("%/init {0} {1} {2}".format(self.chatApp.nickname, "localhost", self.chatApp.port).encode())
         self.chatApp.sysMsg("Connected.")
         self.isConnected = True
     
-    def disconn(self):
-        self.socket.close()
+    def restart(self):
+        self.socket.shutdown(1)
+        socket.SH
         self.isConnected = False
-        self.socket = None
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def send(self, msg):
         if msg != '':
