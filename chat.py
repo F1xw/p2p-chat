@@ -30,7 +30,7 @@ class ChatApp(npyscreen.NPSAppManaged):
         self.partner = ""
         self.nickname = ""
         self.historyPos = 0
-        self.hostname = socket.gethostname()
+        self.hostname = socket.gethostbyname(socket.gethostname())
         self.chatServer = server.Server(self)
         self.chatServer.daemon = True
         self.chatServer.start()
@@ -119,7 +119,7 @@ class ChatApp(npyscreen.NPSAppManaged):
         else:
             if self.chatClient.isConnected:
                 self.chatClient.send(msg)
-                self.chatForm.chatFeed.values.append('You >  {1}'.format(smsg))
+                self.chatForm.chatFeed.values.append('You >  {0}'.format(msg))
                 self.chatForm.chatFeed.display()
             else:
                 self.sysMsg("You are not connected to a partner. Use /help to find out how to connect.")
