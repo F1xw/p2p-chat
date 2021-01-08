@@ -35,32 +35,30 @@ cd ./p2p-chat
 
 ## Requirements
 
-P2P-Chat uses **npyscreen** to build its CLI. Use the package manager [pip](https://pip.pypa.io/en/stable/) to install it:
+P2P-Chat uses several python module. Make sure the package manager [pip](https://pip.pypa.io/en/stable/) is installed, so that p2p-chat can automatically install all required modules.
 
-```
-pip install npyscreen
-```
 ### For Windows users:
 
 **npyscreen** uses the **curses** library which might not be pre-installed on windows.
 Download the corresponding version for your installation from [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses) and install it with [pip](https://pip.pypa.io/en/stable/).
 
 ## Usage
-Run **/cli.py** to start the client.
+Run **/run.py** to start the client.
 ```batch
-python cli.py
-```
-You will be greeted with a slick, nostalgic CLI.
-<br>
-For debugging run **/cli.py** with **--debug** as an attribute.
-```batch
-python cli.py --debug
-```
-To change the server's port:
-```batch
-python cli.py --port [yourPort]
+python run.py
 ```
 
+You will be greeted with a slick, nostalgic CLI.
+
+<i>Try resizing your terminal if the app chrashes instantly.</i>
+
+<br>
+
+To use **p2p-chat** follow these steps:
+- 1. Set your nickname with [/nickname](#nickname)
+- 2. Connect to a peer with [/connect](#Connect%20to%20a%20peer)
+
+You are now able to send messages to the connected peer by typing them in and pressing enter. Take a look at all the other commands down below.
 # Commands
 
 **P2P-Chat** uses commands to setup and connect.
@@ -72,19 +70,125 @@ Try **/help** to get a list of all available commands.
 Use **/connect [host]&nbsp;[port]** to connect to a peer. The client will try to connect for 5 seconds. 
 You will have to set your nickname before connecting using [/nick](#nickname)
 
+<i>Example:</i>
+
+```
+/connect office-pc.local 3333
+```
+
+
 ## Disconnect
 
 Use **/disconnect** to close the current connection.
+
+<i>Example:</i>
+
+```
+/disconnect
+```
 
 ## Nickname
 
 Use **/nick [nickname]** to set your nickname. Updating your nickname while a connection is active will send your new name to the connected peer.
 
+<i>Example:</i>
+
+```
+/nick flowei
+```
+
+
 ## Quit
 
 Use **/quit** to quit the app.
 
+<i>Example:</i>
+
+```
+/quit
+```
+
+
+## Port
+
+Use **/port** to change the port your server runs on.
+
+<i>Example:</i>
+
+```
+/port 3456
+```
+
+
+## Connectback
+
+User **/connectback** to connect to a peer without having to enter their hostname and port. This command is only available if your server receives a connection while your client is not connected.
+
+<i>Example:</i>
+
+```
+/connectback
+```
+
+
+## Clear
+
+Use **/clear** to clear the chat.
+
+<i>Example:</i>
+
+```
+/clear
+```
+
+## Eval
+
+Use **/eval [python code]** to execute python code within the app itself. The output will be relayed to the chat feed.
+
+<i>Example:</i>
+
+```
+# Print the nickname of the connected peer
+/eval print(self.partner)
+```
+
+```
+# Generate a system message
+/eval self.sysMsg("Hello from /eval!")
+```
+
+```
+# Forcefully exit the app
+/eval exit()
+```
+
+## Status
+
+Use **/status** to get the current status of server and client.
+
+<i>Example:</i>
+
+```
+/status
+```
+
+## Log
+
+Use **/log** to log all messages sent and received during your session to a file.
+
+<i>Example:</i>
+
+```
+/log
+```
+
 ## Help
 
 Use **/help** to get a list of all available commands.
+
+<i>Example:</i>
+
+```
+/help
+```
 
