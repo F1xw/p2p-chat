@@ -13,6 +13,7 @@ class chatForm(npyscreen.FormBaseNew):
         self.chatFeed = self.add(npyscreen.BoxTitle, name="Feed", editable=False, max_height=23)
         self.chatInput = self.add(ChatInput, name="Input", footer="Return -> Send", rely=25)
         self.chatInput.entry_widget.handlers.update({curses.ascii.CR: self.parentApp.sendMessage})
+        self.chatInput.entry_widget.handlers.update({curses.ascii.NL: self.parentApp.sendMessage})
         self.chatInput.entry_widget.handlers.update({curses.KEY_UP: self.parentApp.historyBack})
         self.chatInput.entry_widget.handlers.update({curses.KEY_DOWN: self.parentApp.historyForward})
         
