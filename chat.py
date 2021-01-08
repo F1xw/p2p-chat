@@ -31,7 +31,14 @@ class ChatApp(npyscreen.NPSAppManaged):
         self.partner = ""
         self.nickname = ""
         self.historyPos = 0
-        self.hostname = socket.gethostbyname(socket.gethostname())
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(("8.8.8.8", 80))
+        except Exception:
+            self.sysMsg("It seems like you do not have internet access.")
+            self.sysMsg("Could not get host IP. Could not reach Google DNS.")
+        self.hostname = s.getsockname()[0]
+        s.close()
         self.chatServer = server.Server(self)
         self.chatServer.daemon = True
         self.chatServer.start()
