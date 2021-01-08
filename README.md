@@ -122,7 +122,7 @@ Use **/port** to change the port your server runs on.
 
 ## Connectback
 
-User **/connectback** to connect to a peer without having to enter their hostname and port. This command is only available if your server receives a connection while your client is not connected.
+Use **/connectback** to connect to a peer without having to enter their hostname and port. This command is only available if your server receives a connection while your client is not connected.
 
 <i>Example:</i>
 
