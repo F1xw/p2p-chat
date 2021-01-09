@@ -55,8 +55,8 @@ You will be greeted with a slick, nostalgic CLI.
 <br>
 
 To use **p2p-chat** follow these steps:
-- 1. Set your nickname with [/nickname](#nickname)
-- 2. Connect to a peer with [/connect](#Connect%20to%20a%20peer)
+1. Set your nickname with [/nickname](#nickname)
+2. Connect to a peer with [/connect](#Connect%20to%20a%20peer)
 
 You are now able to send messages to the connected peer by typing them in and pressing enter. Take a look at all the other commands down below.
 # Commands
