@@ -3,37 +3,38 @@ import threading
 import sys
 import time
 
-class Client(threading.Thread):
-    def __init__(self, chatApp):
+class Client(threading.Thread): # Client object is type thread so that it can run simultaniously with the server
+    def __init__(self, chatApp): # Initialize with a reference to the Chat App
         super(Client, self).__init__()
         self.chatApp = chatApp
-        self.isConnected = False
+        self.isConnected = False # Connection status
 
+    # Start method called by threading module
     def run(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create new socket
         self.socket.settimeout(5)
 
     def conn(self, args):
-        if self.chatApp.nickname == "":
+        if self.chatApp.nickname == "": # Check if a nickname is set and return False if not
             self.chatApp.sysMsg("You nickname is not set. Try /help to find out how.")
             return False
-        host = args[0]
-        port = int(args[1])
+        host = args[0] # IP of peer
+        port = int(args[1]) # Port of peer
         self.chatApp.sysMsg("Connecting to {0} on port {1}".format(host, port))
-        try:
+        try: # Try to connect and catch error on fail
             self.socket.connect((host, port))
         except socket.error:
             self.chatApp.sysMsg("Could not connect. Attempt timed out.")
             return False
-        self.socket.send("\b/init {0} {1} {2}".format(self.chatApp.nickname, self.chatApp.hostname, self.chatApp.port).encode())
+        self.socket.send("\b/init {0} {1} {2}".format(self.chatApp.nickname, self.chatApp.hostname, self.chatApp.port).encode()) # Exchange initial information (nickname, ip, port)
         self.chatApp.sysMsg("Connected.")
-        self.isConnected = True
+        self.isConnected = True # Set connection status to true
     
+    # Method called by Chat App to reset client socket
     def restart(self):
-        self.socket.shutdown(1)
-        socket.SH
-        self.isConnected = False
+        self.socket.close()
 
+    # Method to send data to a peer
     def send(self, msg):
         if msg != '':
             self.socket.send(msg.encode())
