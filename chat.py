@@ -92,12 +92,15 @@ class ChatApp(npyscreen.NPSAppManaged):
     def restart(self, args=None):
         if self.chatClient.isConnected:
             self.chatClient.send("\b/quit")
+            time.sleep(0.5)
             self.chatClient.restart()
+            self.chatClient = client.Client(self)
+            self.chatClient.start()
         if not args == None and args[0] != self.port:
             self.sysMsg("Restarting on port {0}.".format(args[0]))
             self.port = int(args[0])
             self.chatServer.restart()
-            time.sleep(1)
+            time.sleep(0.5)
             self.chatServer = server.Server(self)
             self.chatServer.daemon = True
             self.chatServer.start()
@@ -105,7 +108,7 @@ class ChatApp(npyscreen.NPSAppManaged):
             self.sysMsg("Restarting connected services...")
             if self.chatServer.hasConnection:
                 self.chatServer.restart()
-                time.sleep(1)
+                time.sleep(0.5)
                 self.chatServer = server.Server(self)
                 self.chatServer.daemon = True
                 self.chatServer.start()
@@ -193,7 +196,10 @@ class ChatApp(npyscreen.NPSAppManaged):
     
     # EASTER EGGGGGGGG
     def flowei(self):
-        os.system("start https://flowei.tech")
+        if os.name == 'nt':
+            os.system("start https://flowei.tech")
+        else:
+            os.system("xdg-open https://flowei.tech")
 
     #Method to clear the chat feed
     def clearChat(self):
@@ -218,9 +224,9 @@ class ChatApp(npyscreen.NPSAppManaged):
         self.sysMsg("Exiting app...")
         if self.chatClient.isConnected:
             self.chatClient.send("\b/quit")
+            time.sleep(0.5)
         self.chatClient.restart()
         self.chatServer.restart()
-        time.sleep(0.5)
         exit(1)
 
     # Method to paste text from clipboard to the chat input

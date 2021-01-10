@@ -54,8 +54,8 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
         self.handleInit(init)
         
         while True: # Receive loop
-            if len(self.chatForm.chatFeed.values) > self.chatForm.y - 10:
-                self.clearChat()
+            if len(self.chatApp.chatForm.chatFeed.values) > self.chatApp.chatForm.y - 10:
+                self.chatApp.clearChat()
             data = conn.recv(1024) # Wait for data
             if not data: # If data is empty throw an error
                 self.chatApp.sysMsg("ERROR: Recieved an empty message.")
@@ -101,7 +101,7 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
         else:
             self.stopSocket = True
             socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(('localhost', self.port))
-            time.sleep(1)
+            time.sleep(0.5)
             self.socket.close()
         self.socket = None
         
