@@ -31,7 +31,7 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
             args = command[1:]
         command = command[0][2:]
         if not command in self.commandDict:
-            self.chatApp.sysMsg("Your peer sent an invalid command. Make sure they use the same version as you!")
+            self.chatApp.sysMsg("The peer sent an invalid command. Make sure they use the same version as you!")
             self.chatApp.chatClient.send("\b/syntaxErr")
         else:
             if self.commandDict[command][1] == 0:
@@ -39,7 +39,7 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
             elif len(args) == self.commandDict[command][1]:
                 self.commandDict[command][0](args)
             else:
-                self.chatApp.sysMsg("Your peer sent an invalid command syntax.")
+                self.chatApp.sysMsg("The peer sent an invalid command syntax.")
                 self.chatApp.sysMsg("Make sure they use the same version as you!")
                 self.chatApp.chatClient.send("\b/syntaxErr")
 
@@ -59,7 +59,8 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
             data = conn.recv(1024) # Wait for data
             if not data: # If data is empty throw an error
                 self.chatApp.sysMsg("ERROR: Recieved an empty message.")
-                continue
+                self.chatApp.sysMsg("Disconnecting sockets...")
+                break
 
             if data.decode().startswith('\b/'): # If data is command for information exchange call the command handler
                 self.commandHandler(data)
@@ -122,5 +123,5 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
 
     # Method called if connected peer uses an invalid information exchange command syntax
     def chatClientVersionsOutOfSync(self):
-        self.chatApp.sysMsg("An error occured while communicating to your peers system. Please make sure that you use the same version as them.")
+        self.chatApp.sysMsg("An error occured while communicating to the peers system. Please make sure that you use the same version as them.")
         
