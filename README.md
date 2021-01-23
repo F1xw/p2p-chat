@@ -149,7 +149,7 @@ Use **/eval [python code]** to execute python code within the app itself. The ou
 
 ```
 # Print the nickname of the connected peer
-/eval print(self.partner)
+/eval print(self.peer)
 ```
 
 ```

@@ -31,13 +31,21 @@ class Client(threading.Thread): # Client object is type thread so that it can ru
         self.isConnected = True # Set connection status to true
     
     # Method called by Chat App to reset client socket
-    def restart(self):
+    def stop(self):
         self.socket.close()
+        self.socket = None
 
     # Method to send data to a peer
     def send(self, msg):
         if msg != '':
-            self.socket.send(msg.encode())
+            try:
+                self.socket.send(msg.encode())
+                return True
+            except socket.error as error:
+                self.chatApp.sysMsg("Could not send data to peer. Disconnecting socket...")
+                self.chatApp.sysMsg(error)
+                self.isConnected = False
+                return False
 
 
     
