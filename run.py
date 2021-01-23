@@ -44,7 +44,7 @@ if missingModules:
         i = input("Press Enter to Exit >>")
         exit(1)
 else:
-    import chat # Import the Chat App
+    import chat # Import the Chat App from chat.py
     chatApp = chat.ChatApp().run() # Run the Chat App
 
 
