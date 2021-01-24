@@ -10,35 +10,43 @@ import socket
 import datetime
 import pyperclip
 import os
+import json
 from io import StringIO
 
 class ChatApp(npyscreen.NPSAppManaged):
-    # Method called at start
+    # Method called at start by npyscreen
     def onStart(self):
+        jsonFile = open('lang/en.json')
+        self.lang = json.loads(jsonFile.read())
+        jsonFile.close()
+
         if os.name == "nt":
             os.system("title P2P-Chat by flowei") # Set window title on windows
 
         self.ChatForm = self.addForm('MAIN', ChatForm, name='Peer-2-Peer Chat') # Add ChatForm as the main form of npyscreen
 
-        #Get this PCs public IP
+        #Get this PCs public IP and catch error
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             s.connect(("8.8.8.8", 80))
-        except Exception:
-            self.sysMsg("It seems like you do not have internet access.")
-            self.sysMsg("Could not get host IP. Could not reach Google DNS.")
-        self.hostname = s.getsockname()[0]
-        s.close()
+            self.hostname = s.getsockname()[0]
+            s.close()
+        except socket.error as error:
+            self.sysMsg(self.lang['noInternetAccess'])
+            self.sysMsg(self.lang['failedFetchPublicIP'])
+            self.hostname = "0.0.0.0"
 
-        #Define initial vars
-        self.port = 3333
-        self.nickname = ""
-        self.peer = ""
-        self.peerIP = "0"
-        self.peerPort = "0"
-        self.historyLog = []
-        self.messageLog = []
-        self.historyPos = 0
+        #Define initial variables
+        self.port = 3333 # Port the server runs on
+        self.nickname = "" # Empty variable to be filled with users nickname
+        self.peer = "" # Peer nickname
+        self.peerIP = "0" # IP of peer
+        self.peerPort = "0" # Port of peer
+        self.historyLog = [] # Array for message log
+        self.messageLog = [] # Array for chat log
+        self.historyPos = 0 # Int for current position in message history
+
+        
 
         # Start Server and Client threads
         self.chatServer = server.Server(self)
@@ -47,34 +55,44 @@ class ChatApp(npyscreen.NPSAppManaged):
         self.chatClient = client.Client(self)
         self.chatClient.start()
 
-        # Dictionary for commands
+        # Dictionary for commands. Includes funtion to call, number of needed arguments and description
         self.commandDict = {
             "connect": [self.chatClient.conn, 2, "/connect [host] [port] | Connect to a peer"],
             "disconnect": [self.restart, 0, "/disconnect | Disconnect from the current chat"],
-            "nick": [self.setNickname, 1, "/nick [nickname] | Set your nickname"],
+            "nickname": [self.setNickname, 1, "/nickname [nickname] | Set your nickname"],
             "quit": [self.exitApp, 0, "/quit | Quit the app"],
             "port": [self.restart, 1, "/port [port] | Restart server on specified port"],
             "connectback": [self.connectBack, 0, "/connectback | Connect to the client that is connected to your server"],
             "clear": [self.clearChat, 0, "/clear | Clear the chat. Logs will not be deleted"],
-            "eval": [self.evalCode, -1, "/eval | Execute python code"],
+            "eval": [self.evalCode, -1, "/eval [code] | Execute python code"],
             "status": [self.getStatus, 0, "/status | Returns the clients status"],
-            "log": [self.logChat, 0, "/log | Logs all messages of the current session to a file."],
+            "log": [self.logChat, 0, "/log | Logs all messages of the current session to a file"],
             "help": [self.commandHelp, 0, "/help | Shows this help"],
             "flowei": [self.flowei, 0, ""],
-            "halt": [self.halt, 0, "/halt | Halts the app so you can look at errors if stuck in a loop"]
+            "lang": [self.changeLang, 1, "/lang [language] | Changes language to specified two digit country code"]
         }
 
         # Dictionary for command aliases
         self.commandAliasDict = {
-            "nickname": "nick",
+            "nick": "nickname",
             "conn": "connect",
             "q": "quit",
             "connback": "connectback"
         }
 
+    def changeLang(self, args):
+        self.sysMsg(self.lang['changingLang'].format(args[0]))
+        try:
+            jsonFile = open('lang/{0}.json'.format(args[0]))
+            self.lang = json.loads(jsonFile.read())
+            jsonFile.close()
+        except Exception as e:
+            self.sysMsg(self.lang['failedChangingLang'])
+            self.sysMsg(e)
+
     # Method to reset server and client sockets
     def restart(self, args=None):
-        self.sysMsg("Restarting sockets...")
+        self.sysMsg(self.lang['restarting'])
         if not args == None and args[0] != self.port:
             self.port = int(args[0])
         if self.chatClient.isConnected:
@@ -110,7 +128,7 @@ class ChatApp(npyscreen.NPSAppManaged):
     # Method to set nickname of client | Nickname will be sent to peer for identification
     def setNickname(self, args):
         self.nickname = args[0]
-        self.sysMsg("Set nickname to {0}".format(args[0]))
+        self.sysMsg("{0} {1}".format(self.lang['setNickname'].format(args[0])))
         if self.chatClient.isConnected:
             self.chatClient.send("\b/nick {0}".format(args[0]))
 
@@ -129,7 +147,7 @@ class ChatApp(npyscreen.NPSAppManaged):
             return False
         if len(self.ChatForm.chatFeed.values) > self.ChatForm.y - 11:
                 self.clearChat()
-        self.messageLog.append("You > "+msg)
+        self.messageLog.append(self.lang['you']+" > "+msg)
         self.historyLog.append(msg)
         self.historyPos = len(self.historyLog)
         self.ChatForm.chatInput.value = ""
@@ -139,20 +157,20 @@ class ChatApp(npyscreen.NPSAppManaged):
         else:
             if self.chatClient.isConnected:
                 if self.chatClient.send(msg):
-                    self.ChatForm.chatFeed.values.append('You >  {0}'.format(msg))
+                    self.ChatForm.chatFeed.values.append(self.lang['you']+" > "+msg)
                     self.ChatForm.chatFeed.display()
             else:
-                self.sysMsg("You are not connected to a peer. Use /help to find out how to connect.")
+                self.sysMsg(self.lang['notConnected'])
 
     # Method to connect to a peer that connected to the server
     def connectBack(self):
         if self.chatServer.hasConnection and not self.chatClient.isConnected:
             if self.peerIP == "unknown" or self.peerPort == "unknown":
-                self.sysMsg("Cannot connect. Peer IP and/or port unknown.")
+                self.sysMsg(self.lang['failedConnectPeerUnkown'])
                 return False
             self.chatClient.conn([self.peerIP, int(self.peerPort)])
         else:
-            self.sysMsg("You are already connected.")
+            self.sysMsg(self.lang['alreadyConnected'])
 
     #Method to log the chat to a file | Files can be found in root directory
     def logChat(self):
@@ -162,11 +180,11 @@ class ChatApp(npyscreen.NPSAppManaged):
             for msg in self.messageLog:
                 log.write(msg+"\n")
         except Exception:
-            self.sysMsg("Could not interact with file.")
+            self.sysMsg(self.lang['failedSaveLog'])
             return False
         log.close()
         self.messageLog = []
-        self.sysMsg("Dumped log to p2p-chat-log_{0}.log".format(date))
+        self.sysMsg(self.lang['savedLog'].format(date))
     
     # EASTER EGGGGGGGG
     def flowei(self):
@@ -195,7 +213,7 @@ class ChatApp(npyscreen.NPSAppManaged):
             
     # Method to exit the app | Exit command will be sent to a connected peer so that they can disconnect their sockets
     def exitApp(self):
-        self.sysMsg("Exiting app...")
+        self.sysMsg(self.lang['exitApp'])
         if self.chatClient.isConnected:
             self.chatClient.send("\b/quit")
         self.chatClient.stop()
@@ -206,10 +224,6 @@ class ChatApp(npyscreen.NPSAppManaged):
     def pasteFromClipboard(self, _input):
         self.ChatForm.chatInput.value = pyperclip.paste()
         self.ChatForm.chatInput.display()
-
-    def halt(self):
-        self.chatClient = None
-        self.chatServer = None
         
     # Method to handle commands
     def commandHandler(self, msg):
@@ -224,38 +238,34 @@ class ChatApp(npyscreen.NPSAppManaged):
         if command in self.commandAliasDict:
             command = self.commandAliasDict[command]
         if not command in self.commandDict:
-            self.sysMsg("Command not found. Try /help for a list of commands!")
+            self.sysMsg(self.lang['commandNotFound'])
         else:
             if self.commandDict[command][1] == 0:
                 self.commandDict[command][0]()
             elif len(args) == self.commandDict[command][1]:
                 self.commandDict[command][0](args)
             else:
-                self.sysMsg("/{0} takes {1} argument(s) but {2} was/were given.".format(command, self.commandDict[command][1], len(args)))
+                self.sysMsg(self.lang['commandWrongSyntax'].format(command, self.commandDict[command][1], len(args)))
 
     # Method to print a list of all commands
     def commandHelp(self):
         if len(self.ChatForm.chatFeed.values) + len(self.commandDict) + 1 > self.ChatForm.y - 10:
             self.clearChat()
-        self.sysMsg("Here's a list of available commands:")
+        self.sysMsg(self.lang['commandList'])
         for command in self.commandDict:
             if not self.commandDict[command][2] == "":
                 self.sysMsg(self.commandDict[command][2])
 
     # Method to print the status of server and client
     def getStatus(self):
-        self.sysMsg("Client status:")
-        if self.chatServer != None:
-            serverStatus = True
-        else:
-            clientStatus = False
-        if self.chatClient != None:
-            clientStatus = True
-        else:
-            serverStatus = False
-        self.sysMsg("Server > Running: {0} | Port: {1} | Is connected: {2}".format(serverStatus, self.port, self.chatServer.hasConnection))
-        self.sysMsg("Client > Running: {0} | Is connected: {1}".format(clientStatus, self.chatClient.isConnected))
-        self.sysMsg("Nickname > {0}".format(self.nickname))
+        self.sysMsg("STATUS:")
+        if self.chatServer: serverStatus = True
+        else: serverStatus = False
+        if self.chatClient: client = True
+        else: clientStatus = False
+        self.sysMsg(self.lang['serverStatusMessage'].format(serverStatus, self.port, self.chatServer.hasConnection))
+        self.sysMsg(self.lang['clientStatusMessage'].format(clientStatus, self.chatClient.isConnected))
+        if not self.nickname == "": self.sysMsg(self.lang['nicknameStatusMessage'].format(self.nickname))
 
 if __name__ == '__main__':
     chatApp = ChatApp().run() # Start the app if chat.py is executed

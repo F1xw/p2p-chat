@@ -22,7 +22,7 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
         self.socket.bind((self.host, self.port)) # Bind the socket to host and port stored in the servers vars
         self.socket.listen() # Set socket mode to listen
 
-        self.chatApp.sysMsg("Started server on port {0}.".format(self.port))
+        self.chatApp.sysMsg(self.chatApp.lang['serverStarted'].format(self.port))
 
     # Method to handle information exchange commands
     def commandHandler(self, command):
@@ -31,7 +31,7 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
             args = command[1:]
         command = command[0][2:]
         if not command in self.commandDict:
-            self.chatApp.sysMsg("The peer sent an invalid command. Make sure they use the same version as you!")
+            self.chatApp.sysMsg(self.chatApp.lang['peerInvalidCommand'])
             self.chatApp.chatClient.send("\b/syntaxErr")
         else:
             if self.commandDict[command][1] == 0:
@@ -39,8 +39,7 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
             elif len(args) == self.commandDict[command][1]:
                 self.commandDict[command][0](args)
             else:
-                self.chatApp.sysMsg("The peer sent an invalid command syntax.")
-                self.chatApp.sysMsg("Make sure they use the same version as you!")
+                self.chatApp.sysMsg(self.chatApp.lang['peerInvalidSyntax'])
                 self.chatApp.chatClient.send("\b/syntaxErr")
 
     # Method called by threading on start
@@ -58,8 +57,8 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
                 self.chatApp.clearChat()
             data = conn.recv(1024) # Wait for data
             if not data: # If data is empty throw an error
-                self.chatApp.sysMsg("ERROR: Recieved an empty message.")
-                self.chatApp.sysMsg("Disconnecting sockets...")
+                self.chatApp.sysMsg(self.chatApp.lang['receivedEmptyMessage'])
+                self.chatApp.sysMsg(self.chatApp.lang['disconnectSockets'])
                 break
 
             if data.decode().startswith('\b/'): # If data is command for information exchange call the command handler
@@ -91,12 +90,12 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
 
         if not self.chatApp.chatClient.isConnected: # Send message to inform about connectBack if client socket is not connected
             if self.chatApp.peerIP == "unknown" or self.chatApp.peerPort == "unknown":
-                self.chatApp.sysMsg("/connectback is unavailable as peer IP and/or port is unknown.")
+                self.chatApp.sysMsg(self.chatApp.lang['failedConnbackPeerUnknown'])
             else:
-                self.chatApp.sysMsg("A client connected to you. To connect to them type /connectback.")
-                self.chatApp.sysMsg("Their IP: {0}, their port: {1}".format(self.chatApp.peerIP, self.chatApp.peerPort))
+                self.chatApp.sysMsg(self.chatApp.lang['connbackInfo'])
+                self.chatApp.sysMsg(self.chatApp.lang['connbackHostInfo'].format(self.chatApp.peerIP, self.chatApp.peerPort))
 
-        self.chatApp.sysMsg("{0} joined the chat.".format(self.chatApp.peer)) # Inform user about peer
+        self.chatApp.sysMsg(self.chatApp.lang['peerConnected'].format(self.chatApp.peer)) # Inform user about peer
 
     # Method called by Chat App to reset server socket
     def stop(self):
@@ -113,15 +112,15 @@ class Server(threading.Thread): # Server object is type thread so that it can ru
     def setpeerNickname(self, nick):
         oldNick = self.chatApp.peer
         self.chatApp.peer = nick[0]
-        self.chatApp.sysMsg("{0} changed their name to {1}".format(oldNick, nick[0]))
+        self.chatApp.sysMsg(self.chatApp.lang['peerChangedName'].format(oldNick, nick[0]))
 
     # Method called if connected peer quit
     def peerQuit(self):
-        self.chatApp.sysMsg("{0} left the chat.".format(self.chatApp.peer))
+        self.chatApp.sysMsg(self.chatApp.lang['peerDisconnected'].format(self.chatApp.peer))
         self.chatApp.chatClient.isConnected = False
         self.chatApp.restart()
 
     # Method called if connected peer uses an invalid information exchange command syntax
     def chatClientVersionsOutOfSync(self):
-        self.chatApp.sysMsg("An error occured while communicating to the peers system. Please make sure that you use the same version as them.")
+        self.chatApp.sysMsg(self.chatApp.lang['versionOutOfSync'])
         

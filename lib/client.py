@@ -16,18 +16,18 @@ class Client(threading.Thread): # Client object is type thread so that it can ru
 
     def conn(self, args):
         if self.chatApp.nickname == "": # Check if a nickname is set and return False if not
-            self.chatApp.sysMsg("You nickname is not set. Try /help to find out how.")
+            self.chatApp.sysMsg(self.chatApp.lang['nickNotSet'])
             return False
         host = args[0] # IP of peer
         port = int(args[1]) # Port of peer
-        self.chatApp.sysMsg("Connecting to {0} on port {1}".format(host, port))
+        self.chatApp.sysMsg(self.chatApp.lang['connectingToPeer'].format(host, port))
         try: # Try to connect and catch error on fail
             self.socket.connect((host, port))
         except socket.error:
-            self.chatApp.sysMsg("Could not connect. Attempt timed out.")
+            self.chatApp.sysMsg(self.chatApp.lang['failedConnectingTimeout'])
             return False
         self.socket.send("\b/init {0} {1} {2}".format(self.chatApp.nickname, self.chatApp.hostname, self.chatApp.port).encode()) # Exchange initial information (nickname, ip, port)
-        self.chatApp.sysMsg("Connected.")
+        self.chatApp.sysMsg(self.chatApp.lang['connected'])
         self.isConnected = True # Set connection status to true
     
     # Method called by Chat App to reset client socket
@@ -42,7 +42,7 @@ class Client(threading.Thread): # Client object is type thread so that it can ru
                 self.socket.send(msg.encode())
                 return True
             except socket.error as error:
-                self.chatApp.sysMsg("Could not send data to peer. Disconnecting socket...")
+                self.chatApp.sysMsg(self.chatApp.lang['failedSentData'])
                 self.chatApp.sysMsg(error)
                 self.isConnected = False
                 return False
