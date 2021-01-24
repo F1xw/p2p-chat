@@ -16,7 +16,17 @@ from io import StringIO
 class ChatApp(npyscreen.NPSAppManaged):
     # Method called at start by npyscreen
     def onStart(self):
-        jsonFile = open('lang/en.json')
+
+        # Try to find settings.json file and load its contents.
+        # Change language according to settings.json
+        # If settings.json is missing, load en.json
+        try:
+            jsonSettings = open('settings.json')
+            self.settings = json.loads(jsonSettings.read())
+            jsonSettings.close()
+            jsonFile = open('lang/{0}.json'.format(self.settings['language']))
+        except Exception:
+            jsonFile = open('lang/en.json')
         self.lang = json.loads(jsonFile.read())
         jsonFile.close()
 
@@ -25,7 +35,7 @@ class ChatApp(npyscreen.NPSAppManaged):
 
         self.ChatForm = self.addForm('MAIN', ChatForm, name='Peer-2-Peer Chat') # Add ChatForm as the main form of npyscreen
 
-        #Get this PCs public IP and catch error
+        #Get this PCs public IP and catch errors
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             s.connect(("8.8.8.8", 80))
@@ -55,21 +65,21 @@ class ChatApp(npyscreen.NPSAppManaged):
         self.chatClient = client.Client(self)
         self.chatClient.start()
 
-        # Dictionary for commands. Includes funtion to call, number of needed arguments and description
+        # Dictionary for commands. Includes funtion to call and number of needed arguments
         self.commandDict = {
-            "connect": [self.chatClient.conn, 2, "/connect [host] [port] | Connect to a peer"],
-            "disconnect": [self.restart, 0, "/disconnect | Disconnect from the current chat"],
-            "nickname": [self.setNickname, 1, "/nickname [nickname] | Set your nickname"],
-            "quit": [self.exitApp, 0, "/quit | Quit the app"],
-            "port": [self.restart, 1, "/port [port] | Restart server on specified port"],
-            "connectback": [self.connectBack, 0, "/connectback | Connect to the client that is connected to your server"],
-            "clear": [self.clearChat, 0, "/clear | Clear the chat. Logs will not be deleted"],
-            "eval": [self.evalCode, -1, "/eval [code] | Execute python code"],
-            "status": [self.getStatus, 0, "/status | Returns the clients status"],
-            "log": [self.logChat, 0, "/log | Logs all messages of the current session to a file"],
-            "help": [self.commandHelp, 0, "/help | Shows this help"],
-            "flowei": [self.flowei, 0, ""],
-            "lang": [self.changeLang, 1, "/lang [language] | Changes language to specified two digit country code"]
+            "connect": [self.chatClient.conn, 2],
+            "disconnect": [self.restart, 0],
+            "nickname": [self.setNickname, 1],
+            "quit": [self.exitApp, 0],
+            "port": [self.restart, 1],
+            "connectback": [self.connectBack, 0],
+            "clear": [self.clearChat, 0],
+            "eval": [self.evalCode, -1],
+            "status": [self.getStatus, 0],
+            "log": [self.logChat, 0],
+            "help": [self.commandHelp, 0],
+            "flowei": [self.flowei, 0],
+            "lang": [self.changeLang, 1]
         }
 
         # Dictionary for command aliases
@@ -80,6 +90,7 @@ class ChatApp(npyscreen.NPSAppManaged):
             "connback": "connectback"
         }
 
+    # Method to change interface language. Files need to be located in lang/
     def changeLang(self, args):
         self.sysMsg(self.lang['changingLang'].format(args[0]))
         try:
@@ -89,6 +100,11 @@ class ChatApp(npyscreen.NPSAppManaged):
         except Exception as e:
             self.sysMsg(self.lang['failedChangingLang'])
             self.sysMsg(e)
+            return False
+        # Save new settings
+        self.settings['language'] = args[0]
+        with open('settings.json', 'w') as file:
+            file.write(json.dumps(self.settings))
 
     # Method to reset server and client sockets
     def restart(self, args=None):
@@ -137,7 +153,11 @@ class ChatApp(npyscreen.NPSAppManaged):
         self.messageLog.append("[SYSTEM] "+str(msg))
         if len(self.ChatForm.chatFeed.values) > self.ChatForm.y - 10:
                 self.clearChat()
-        self.ChatForm.chatFeed.values.append('[SYSTEM] '+str(msg))
+        if len(str(msg)) > self.ChatForm.x - 20:
+            self.ChatForm.chatFeed.values.append('[SYSTEM] '+str(msg[:self.ChatForm.x-20]))
+            self.ChatForm.chatFeed.values.append(str(msg[self.ChatForm.x-20:]))
+        else:
+            self.ChatForm.chatFeed.values.append('[SYSTEM] '+str(msg))
         self.ChatForm.chatFeed.display()
 
     # Method to send a message to a connected peer
@@ -253,8 +273,8 @@ class ChatApp(npyscreen.NPSAppManaged):
             self.clearChat()
         self.sysMsg(self.lang['commandList'])
         for command in self.commandDict:
-            if not self.commandDict[command][2] == "":
-                self.sysMsg(self.commandDict[command][2])
+            if not self.lang['commands'][command] == "":
+                self.sysMsg(self.lang['commands'][command])
 
     # Method to print the status of server and client
     def getStatus(self):

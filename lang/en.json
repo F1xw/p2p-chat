@@ -1,4 +1,19 @@
 {
+    "commands": {
+        "connect": "/connect [host] [port] | Connect to a peer",
+        "disconnect": "/disconnect | Disconnect from the current chat",
+        "nickname": "/nickname [nickname] | Set your nickname",
+        "quit": "/quit | Quit the app",
+        "port": "/port [port] | Restart server on specified port",
+        "connectback": "/connectback | Connect to the client that is connected to your server",
+        "clear": "/clear | Clear the chat. Logs will not be deleted",
+        "eval": "/eval [code] | Execute python code",
+        "status": "/status | Returns the clients status",
+        "log": "/log | Logs all messages of the current session to a file",
+        "help": "/help | Shows this help",
+        "flowei": "",
+        "lang": "/lang [language] | Changes language to specified two digit country code"
+    },
     "noInternetAccess": "It seems like you do not have internet access.",
     "failedFetchPublicIP": "Could not get public IP.",
     "restarting": "Restarting sockets...",
@@ -33,6 +48,6 @@
     "failedConnectingTimeout": "Could not connect. Attempt timed out.",
     "connected": "Connected.",
     "failedSendData": "Could not send data to peer. Disconnecting socket...",
-    "changingLang": "Changing language to {0}.",
+    "changingLang": "Changing language to {0}.json.",
     "failedChangingLang": "Could not change language. File not found."
 }

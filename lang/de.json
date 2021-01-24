@@ -1,4 +1,19 @@
 {
+    "commands": {
+        "connect": "/connect [host] [port] | Mit einem Peer verbinden",
+        "disconnect": "/disconnect | Vom aktuellen Peer trennen",
+        "nickname": "/nickname [nickname] | Spitznamen festlegen",
+        "quit": "/quit | App beenden",
+        "port": "/port [port] | Serverport aendern",
+        "connectback": "/connectback | Mit einem Peer verbinden, der sich mit dir verbindet",
+        "clear": "/clear | Chat loeschen. Logs bleiben bestehen",
+        "eval": "/eval [code] | Code ausfuehren",
+        "status": "/status | Status von Client und Server",
+        "log": "/log | Speichert alle Nachrichten der aktuellen Sitzung",
+        "help": "/help | Zeigt diese Hilfe",
+        "flowei": "",
+        "lang": "/lang [language] | Aendert sprache zu angegebenem Laendercode"
+    },
     "noInternetAccess": "Anscheinend hast du gerade kein Internet.",
     "failedFetchPublicIP": "Konnte deine oeffentliche IP nicht finden.",
     "restarting": "Starte Sockets neu...",
@@ -33,6 +48,6 @@
     "failedConnectingTimeout": "Timeout beim Verbinden.",
     "connected": "Verbunden.",
     "failedSendData": "Konnte keine Daten senden. Trenne Sockets...",
-    "changingLang": "Ändere Sprache auf {0}.",
+    "changingLang": "Aendere Sprache auf {0}.json.",
     "failedChangingLang": "Sprache konnte nicht geaendert werden. Datei nicht gefunden."
 }
