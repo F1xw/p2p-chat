@@ -144,7 +144,7 @@ class ChatApp(npyscreen.NPSAppManaged):
     # Method to set nickname of client | Nickname will be sent to peer for identification
     def setNickname(self, args):
         self.nickname = args[0]
-        self.sysMsg("{0} {1}".format(self.lang['setNickname'].format(args[0])))
+        self.sysMsg("{0}".format(self.lang['setNickname'].format(args[0])))
         if self.chatClient.isConnected:
             self.chatClient.send("\b/nick {0}".format(args[0]))
 
