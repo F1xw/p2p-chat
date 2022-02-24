@@ -1,6 +1,14 @@
 # P2P-Chat
 P2P-Chat is a python based **peer-to-peer** chat client with a **command line interface**.
 
+# For your information:
+
+```
+As this project was only for demonstation purposes as part of my paper on p2p, I will no longer work on p2p-chat.
+You may fork this repository to work on it yourself.
+```
+
+
 ## Peer-to-peer vs. Client/Server
 
 A regular **client/server** based chat:
@@ -13,7 +21,7 @@ Client A        Server       Client B
 
 A **peer-to-peer** based chat:
 
-```mermaid
+```
          /<----\
 Client A        Client B
          \---->/
